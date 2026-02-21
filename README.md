@@ -27,7 +27,3 @@ $W.get_visibility() : int
 $W.log{lb:agz}{n:nat}
   (level: int, msg: !A.borrow(byte, lb, n), msg_len: int n) : void
 ```
-
-## Dependencies
-
-- **array**
