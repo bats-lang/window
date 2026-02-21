@@ -1,4 +1,4 @@
-# v2
+# v3
 name: check
 
 on:
@@ -13,15 +13,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Clone repository-prototype
-        run: git clone https://github.com/bats-lang/repository-prototype.git /tmp/repository-prototype
-
-      - name: Install bats
+      - name: Install ATS2
         run: |
-          curl -sSL https://github.com/bats-lang/bats/releases/latest/download/bats-x86_64-linux.tar.gz | tar xz -C /usr/local/bin
+          curl -sL "https://raw.githubusercontent.com/ats-lang/ats-lang.github.io/master/FROZEN000/ATS-Postiats/ATS2-Postiats-int-0.4.2.tgz" -o /tmp/ats2.tgz
+          mkdir -p ~/.ats2
+          tar -xzf /tmp/ats2.tgz -C ~/.ats2
+          cd ~/.ats2/ATS2-Postiats-int-0.4.2
+          make -j$(nproc) -C src/CBOOT patsopt
+          mkdir -p bin
+          cp src/CBOOT/patsopt bin/patsopt
 
-      - name: Lock
-        run: bats lock --repository /tmp/repository-prototype
+      - name: Cache bats toolchain
+        id: cache-bats
+        uses: actions/cache@v4
+        with:
+          path: ~/bats-toolchain
+          key: bats-${{ runner.os }}-${{ hashFiles('.github/workflows/check.yml') }}
 
-      - name: Check
-        run: bats check --repository /tmp/repository-prototype
+      - name: Build bats
+        if: steps.cache-bats.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/bats-lang/bats.git ~/bats-toolchain
+          cd ~/bats-toolchain
+          cargo build --release
+
+      - name: bats check
+        run: |
+          git clone https://github.com/bats-lang/repository-prototype.git ~/repository
+          ~/bats-toolchain/target/release/bats lock --repository ~/repository
+          ~/bats-toolchain/target/release/bats check --repository ~/repository
