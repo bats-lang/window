@@ -1,29 +1,7 @@
 # window
 
-Window focus, visibility, and logging.
-
-## Log Levels
-
-| Level | Value |
-|-------|-------|
-| LOG   | 0     |
-| WARN  | 1     |
-| ERROR | 2     |
-
-## API
-
-```
-#use wasm.bats-packages.dev/window as W
-#use array as A
-
-(* Bring the window to focus *)
-$W.focus() : void
-
-(* Get document visibility state.
-   Returns 0 = visible, 1 = hidden. *)
-$W.get_visibility() : int
-
-(* Log a message at the given level *)
-$W.log{lb:agz}{n:nat}
-  (level: int, msg: !A.borrow(byte, lb, n), msg_len: int n) : void
-```
+> **Superseded.** This package was absorbed into
+> [bridge](https://github.com/bats-lang/bridge) as the `window` sub-module
+> ([`src/window.bats`](https://github.com/bats-lang/bridge/blob/main/src/window.bats)).
+> Use `#use wasm.bats-packages.dev/bridge` instead. This repository is
+> archived and no longer builds against current bridge.
